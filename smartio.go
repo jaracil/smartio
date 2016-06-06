@@ -57,10 +57,11 @@ func (sr *SmartReader) Read(p []byte) (n int, err error) {
 		err = io.EOF
 		return
 	}
+	atomic.StoreInt64(&sr.last, time.Now().Unix())
 	n, err = sr.r.Read(p)
+	atomic.StoreInt64(&sr.last, time.Now().Unix())
 	atomic.AddInt64(&sr.limit, int64(-n))
 	atomic.AddInt64(&sr.total, int64(n))
-	atomic.StoreInt64(&sr.last, time.Now().Unix())
 	return
 }
 
@@ -91,8 +92,10 @@ func (sw *SmartWriter) GetLast() int64 {
 }
 
 func (sw *SmartWriter) Write(p []byte) (n int, err error) {
-	n, err = sw.w.Write(p)
-	atomic.AddInt64(&sw.total, int64(n))
 	atomic.StoreInt64(&sw.last, time.Now().Unix())
+	n, err = sw.w.Write(p)
+	atomic.StoreInt64(&sw.last, time.Now().Unix())
+	atomic.AddInt64(&sw.total, int64(n))
+
 	return
 }
