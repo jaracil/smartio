@@ -6,10 +6,6 @@ import (
 	"time"
 )
 
-const (
-	defaultChunkSize = 4096
-)
-
 type SmartReader struct {
 	r       io.Reader
 	total   int64
